@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import GoogleLogoutButton from '../components/Auth/GoogleLogoutButton';
 import Skeleton from '../components/Skeleton';
@@ -12,9 +12,6 @@ const Dashboard = () => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const { data = [], error, isFetching } = useFetchCarQuery(); // Set default value for data
 
-	const { user } = useSelector((state) => {
-		return state.auth;
-	});
 	const navigate = useNavigate();
 
 	const handleSearchChange = (e) => {
@@ -35,7 +32,7 @@ const Dashboard = () => {
 		content = (
 			<div className='h-20 w-auto flex flex-row justify-between items-center bg-blue-400'>
 				<Button
-					onClick={() => navigate(user ? '/form' : '/')}
+					onClick={() => navigate('/form')}
 					className='ml-3 text-yellow-300'
 					rounded
 					danger

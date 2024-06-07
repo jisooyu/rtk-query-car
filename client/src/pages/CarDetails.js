@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom';
-import { useThunk } from '../hooks/use-thunk';
-import { deleteData } from '../store/thunks/deleteData';
+import { useRemoveCarMutation } from '../store';
 import Button from '../components/Button';
 
 function CarDetails({ data }) {
-	const [runDeleteData, , deleteDataError] = useThunk(deleteData);
-	const handleClick = (id) => {
-		runDeleteData(id);
-		if (deleteDataError) {
-			console.error(deleteDataError);
-			return;
+	const [removeCar] = useRemoveCarMutation();
+
+	const handleClick = async (id) => {
+		try {
+			await removeCar(id); // Directly pass the id
+			console.log(`Car with id ${id} deleted successfully`);
+		} catch (error) {
+			console.error('Error deleting car:', error);
 		}
 	};
 

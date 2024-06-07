@@ -5,47 +5,49 @@ const carApi = createApi({
 	baseQuery: fetchBaseQuery({
 		baseUrl: 'http://localhost:3000',
 	}),
-	endpoints(builder) {
-		return {
-			fetchCar: builder.query({
-				query: () => {
-					return {
-						url: '/car/fetch',
-						method: 'GET',
-					};
-				},
+	tagTypes: ['Car'],
+	endpoints: (builder) => ({
+		fetchCar: builder.query({
+			query: () => '/car/fetch',
+			providesTags: (result) =>
+				result
+					? [
+							...result.map(({ id }) => ({ type: 'Car', id })),
+							{ type: 'Car', id: 'LIST' },
+					  ]
+					: [{ type: 'Car', id: 'LIST' }],
+		}),
+		addCar: builder.mutation({
+			query: (car) => ({
+				url: '/car/save',
+				method: 'POST',
+				body: car,
 			}),
-			addCar: builder.mutation({
-				query: (car) => {
-					return {
-						url: '/car/save',
-						method: 'POST',
-						body: car,
-					};
-				},
+			invalidatesTags: [{ type: 'Car', id: 'LIST' }],
+		}),
+		removeCar: builder.mutation({
+			invalidatesTags: (result, error, id) => [
+				{ type: 'Car', id },
+				{ type: 'Car', id: 'LIST' },
+			],
+			query: (id) => ({
+				url: `/car/delete/${id}`,
+				method: 'DELETE',
 			}),
-			removeCar: builder.mutation({
-				invalidateTags: (result, error, car) => {
-					return [{ type: 'Car', id: car.id }];
-				},
-				query: (car) => {
-					return {
-						url: `/car/delete/${car.id}`,
-						method: 'DELETE',
-					};
-				},
+		}),
+		editCar: builder.mutation({
+			query: ({ id, formDataObject }) => ({
+				url: `/car/update/${id}`,
+				method: 'PUT',
+				body: formDataObject,
 			}),
-			editCar: builder.mutation({
-				query: (updatedCar) => {
-					return {
-						url: `/car/update/${updatedCar.id}`,
-						method: 'PUT',
-						body: updatedCar,
-					};
-				},
-			}),
-		};
-	},
+			invalidatesTags: [{ type: 'Car', id: 'LIST' }],
+		}),
+		fetchCarById: builder.query({
+			query: (id) => `/car/fetchDataById/${id}`,
+			providesTags: (result, error, id) => [{ type: 'Car', id }],
+		}),
+	}),
 });
 
 export const {
@@ -53,5 +55,6 @@ export const {
 	useAddCarMutation,
 	useRemoveCarMutation,
 	useEditCarMutation,
+	useFetchCarByIdQuery,
 } = carApi;
 export { carApi };
